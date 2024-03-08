@@ -1,0 +1,146 @@
+﻿@model IEnumerable<UnitOfWorkTrial.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<div class="col-4 p-0 justify-content mt-1">
+    <form asp-asp-controller="Employees" asp-action="Index" method="get" >
+        <span class="btn-group">
+            <input name="page" value="@ViewBag.CurrentPage" hidden/>
+            <input class="form-control" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
+            <input class="p-1 ml-2 btn btn-outline-primary btn-sm" type="submit" value="Search" />
+        </span>
+    </form>
+</div>
+<div class="col-2 p-0 justify-content mt-1">
+<select class="form-control" id="Department" multiple asp-items="ViewBag.DepartmentId">
+
+</select>
+</div>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th> 
+            <th>
+                @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
+@*                 @Html.DisplayNameFor(model => model.Name)
+ *@                
+            </th>
+            <th>
+                @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
+@*                 @Html.DisplayNameFor(model => model.Email)
+ *@
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Position)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DepartmentId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Position)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DepartmentId)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+<div class="container">
+    @if (ViewBag.TotalPages > 0)
+    {
+        <ul class="pagination justify-content-end">
+
+
+           
+
+            @if (ViewBag.CurrentPage > 1)
+            {
+
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="1" asp-route-SearchText="@ViewBag.SearchText">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-SearchText="@ViewBag.SearchText">Previous</a>
+                </li>
+            }
+            
+
+           @*  @for (var i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@i">@i</a>
+                </li>
+            } *@
+
+            @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
+            {
+               
+                <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@Page" asp-route-SearchText="@ViewBag.SearchText">@Page</a>
+                </li>
+                
+            }
+
+            @if (ViewBag.currentPage < ViewBag.TotalPages)
+            {
+
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-SearchText="@ViewBag.SearchText">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.TotalPages)" asp-route-SearchText="@ViewBag.SearchText">Last</a>
+                </li>
+            }
+
+           
+        </ul>
+    }
+
+</div>
+
+<script>
+    $(Document).ready(function () {
+        $('#Department').select2({
+            placeholder: 'Select Departments',
+            allowClear: true,
+            tags: true // With this, you can add data that are not in the select options
+        });
+    });
+
+</script>
