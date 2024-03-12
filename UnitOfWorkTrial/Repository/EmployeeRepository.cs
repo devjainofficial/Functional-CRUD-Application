@@ -13,23 +13,28 @@ namespace UnitOfWorkTrial.Repository
         {
             return await _context.Employees.Include(e => e.Department).ToListAsync();
         }
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(int Page, int Size)
+        {
+            return await _context.Employees.FromSqlRaw($"sp_Employee @Pageindex = '{Page}', @Pagesize = '{Size}'").ToListAsync();
+        }
 
         public async Task<int> GetAllEmployeesCountAsync()
         {
             return await _context.Employees.Include(e => e.Department).CountAsync();
         }
-        public async Task<int> GetAllEmployeesCountAsync(string searchString)
+        public async Task<int> GetAllEmployeesCountAsync(string searchString, int[] deps)
         {
-            return await _context.Employees.Where(x => x.Name.StartsWith(searchString)).Include(e => e.Department).CountAsync();
+            return await _context.Employees.Where(x => x.Name.StartsWith(searchString) && deps.Contains(x.DepartmentId)).Include(e => e.Department).CountAsync();
         } 
         public async Task<List<Employee>> GetEmployeeAsync(string SearchText)
         {
             var employee =  await _context.Employees.Include(e => e.Department).Where(e => e.Name.Contains(SearchText)).ToListAsync();
             return employee;
         }
-        public async Task<List<Employee>> GetStoredProcedure(int Page, int Size, string SearchText)
+        public async Task<List<Employee>> GetStoredProcedure(int Page, int Size, string SearchText, string arrayString)
         {
-            var empData = await _context.Employees.FromSqlRaw($"sp_Employees @Pageindex = '{Page}', @Pagesize = '{Size}', @SearchName = '{SearchText}'").ToListAsync();
+            var query = $"sp_Employees @Pageindex = '{Page}', @Pagesize = '{Size}', @SearchName = '{SearchText}', @Arraystring = '{arrayString}'";
+            var empData = await _context.Employees.FromSqlRaw(query).ToListAsync();
             return (empData);
         }   
 

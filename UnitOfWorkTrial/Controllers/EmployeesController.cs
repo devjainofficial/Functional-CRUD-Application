@@ -18,22 +18,30 @@ namespace UnitOfWorkTrial.Controllers
         }
 
         //Get Employees
-        //[HttpGet]
-        public async Task<IActionResult> Index(Employee employee, string sortOrder, string searchText = "", int page = 1, int size = 10)
+        public async Task<IActionResult> Index(Employee employee, int[] DepId, string searchText = "", int page = 1, int size = 10)
         {
-            //Using Employee Repository to fetch all the data.  
-            //int recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync();
             int recsCount = 0;
-            List<Employee> sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText);
-            if(searchText == "")
+            List<Employee> sp;
+            string ArrayString = String.Join(",", DepId);
+
+            recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);
+            if (recsCount <= (page - 1) * size)
             {
-                recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync();
-            }   
-            
-            if (searchText != "")
-            {
-                recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText);
+                page = 1;
             }
+
+            if (ArrayString == "")
+            {
+                //ArrayString = "1,2";
+                sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
+            }
+            else
+            {
+
+                sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
+            }
+             
+            
             int totalPages = (int)Math.Ceiling((decimal)recsCount / (decimal)size);
             int currentPage = page;
             int startPage = currentPage - 5;
@@ -53,33 +61,16 @@ namespace UnitOfWorkTrial.Controllers
                 }
             }
 
-
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.EmailSortParm = String.IsNullOrEmpty(sortOrder) ? "email_desc" : "";
-            var employees = await _unitOfWork.Employees.GetAllEmployeesAsync();
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    employees = employees.OrderByDescending(e => e.Name);
-                    break;
-                case "email_desc":
-                    employees = employees.OrderByDescending(e => e.Name);
-                    break;
-                default:
-                    employees = employees.OrderBy(s => s.Name);
-                    break;
-            }
-
-
-
             ViewBag.CurrentPage = currentPage;
             ViewBag.TotalPages = totalPages;
             ViewBag.StartPage = startPage;
             ViewBag.EndPage = endPage;
             ViewBag.SearchText = searchText;
             ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments.GetAllAsync(), "DepartmentId", "Name");
+            ViewBag.DepId = DepId;
+            ViewBag.ArrayString = ArrayString;
             ViewBag.Data = sp;
-            return View(sp); 
+            return View(sp);
             
         }       
 

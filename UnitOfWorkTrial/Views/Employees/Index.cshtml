@@ -2,46 +2,66 @@
 
 @{
     ViewData["Title"] = "Index";
+    string SearchQuery = @ViewBag.SearchText;
 }
 
-<h1>Index</h1>
+<h1 class="text-center">Employee Database</h1>
+<br/>
+<div class="hstack gap-3">
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<div class="col-4 p-0 justify-content mt-1">
-    <form asp-asp-controller="Employees" asp-action="Index" method="get" >
+    <form asp-asp-controller="Employees" asp-action="Index" method="get">
         <span class="btn-group">
-            <input name="page" value="@ViewBag.CurrentPage" hidden/>
-            <input class="form-control" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
-            <input class="p-1 ml-2 btn btn-outline-primary btn-sm" type="submit" value="Search" />
+            <input name="page" value="@ViewBag.CurrentPage" hidden />
+            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
+
         </span>
+
+        <select class="form-control" id="Department" name="DepId" multiple>
+            @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
+            {
+                string str = @ViewBag.ArrayString;
+                var cast = (Department)dep;
+                if (str.Split(',').Contains(cast.DepartmentId.ToString()))
+                {
+                    <option value="@cast.DepartmentId" selected>@cast.Name</option>
+                }
+                else
+                {
+                    <option value="@cast.DepartmentId">@cast.Name</option>
+                }
+            }
+        </select>
+        <input class="btn btn-secondary" type="submit" value="Search" />
     </form>
+    <div class="vstack gap-3" align="right">
+        <form asp-action="Create">
+            <button type="submit" class="btn btn-dark position-relative">Add New Employee</button>
+        </form>
+    </div> 
 </div>
-<div class="col-2 p-0 justify-content mt-1">
-<select class="form-control" id="Department" multiple asp-items="ViewBag.DepartmentId">
-
-</select>
-</div>
 
 
 
-<table class="table">
+<br />
+
+
+
+
+<table class="table table-striped">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Id)
             </th> 
             <th>
-                @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
-@*                 @Html.DisplayNameFor(model => model.Name)
- *@                
+@*                 @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
+ *@                @Html.DisplayNameFor(model => model.Name)
+                
             </th>
             <th>
-                @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
-@*                 @Html.DisplayNameFor(model => model.Email)
- *@
+@*                 @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
+ *@                @Html.DisplayNameFor(model => model.Email)
+
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Position)
@@ -68,12 +88,18 @@
                 @Html.DisplayFor(modelItem => item.Position)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DepartmentId)
+                @Html.DisplayFor(modelItem => item.Department.Name)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td class="hstack gap-3">
+                <form asp-action="Edit" asp-route-id="@item.Id">
+                    <button type="submit" class="btn btn-success position-relative">Edit</button>
+                </form>
+                <form asp-action="Details" asp-route-id="@item.Id">
+                    <button type="submit" class="btn btn-primary position-relative">Details</button>
+                </form>
+                <form asp-action="Delete" asp-route-id="@item.Id">
+                    <button type="submit" class="btn btn-danger position-relative">Delete</button>
+                </form>
             </td>
         </tr>
 }
@@ -86,17 +112,14 @@
     {
         <ul class="pagination justify-content-end">
 
-
-           
-
             @if (ViewBag.CurrentPage > 1)
             {
 
                 <li class="page-item">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="1" asp-route-SearchText="@ViewBag.SearchText">First</a>
+                    <a class="page-link" onclick="SetDepartment(1,'@SearchQuery'">First</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage - 1)" asp-route-SearchText="@ViewBag.SearchText">Previous</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1),'@SearchQuery'">Previous</a>
                 </li>
             }
             
@@ -110,21 +133,20 @@
 
             @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
             {
-               
                 <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@Page" asp-route-SearchText="@ViewBag.SearchText">@Page</a>
+                    <a class="page-link" onclick = "SetDepartment(@Page,'@SearchQuery')">@Page</a>
                 </li>
-                
+
             }
 
             @if (ViewBag.currentPage < ViewBag.TotalPages)
             {
 
                 <li class="page-item">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.CurrentPage + 1)" asp-route-SearchText="@ViewBag.SearchText">Next</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage + 1),'@SearchQuery'">Next</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@(ViewBag.TotalPages)" asp-route-SearchText="@ViewBag.SearchText">Last</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.TotalPage),'@SearchQuery'">Last</a>
                 </li>
             }
 
@@ -143,4 +165,24 @@
         });
     });
 
+</script>
+
+<script>
+    function SetDepartment(Page, SearchText) {
+        debugger
+        var path = "/Employees/Index?Page=" + Page;
+        if (SearchText != null && SearchText != '') {
+            path += "&SearchText=" + SearchText;
+        }
+
+        var a = [@ViewBag.ArrayString];
+
+        if (a.length > 0){
+            debugger
+            $.each(a, function (index, value) {
+                path += "&DepId=" + value;
+            })
+        }
+        window.location.href = 'https://localhost:7178' + path;
+    };
 </script>
