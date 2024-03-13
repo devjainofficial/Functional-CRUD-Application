@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.Drawing;
 using UnitOfWorkTrial.GenericRepository;
 using UnitOfWorkTrial.Models;
@@ -24,11 +25,16 @@ namespace UnitOfWorkTrial.Repository
         }
         public async Task<int> GetAllEmployeesCountAsync(string searchString, int[] deps)
         {
-            return await _context.Employees.Where(x => x.Name.StartsWith(searchString) && deps.Contains(x.DepartmentId)).Include(e => e.Department).CountAsync();
-        } 
+            var query = _context.Employees.AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+                query = query.Where(x => x.Name.StartsWith(searchString));
+            if (deps.Length > 0)
+               query = query.Where(x => deps.Contains(x.DepartmentId));
+            return query.Count();
+        }
         public async Task<List<Employee>> GetEmployeeAsync(string SearchText)
         {
-            var employee =  await _context.Employees.Include(e => e.Department).Where(e => e.Name.Contains(SearchText)).ToListAsync();
+            var employee = await _context.Employees.Include(e => e.Department).Where(e => e.Name.Contains(SearchText)).ToListAsync();
             return employee;
         }
         public async Task<List<Employee>> GetStoredProcedure(int Page, int Size, string SearchText, string arrayString)
@@ -36,7 +42,7 @@ namespace UnitOfWorkTrial.Repository
             var query = $"sp_Employees @Pageindex = '{Page}', @Pagesize = '{Size}', @SearchName = '{SearchText}', @Arraystring = '{arrayString}'";
             var empData = await _context.Employees.FromSqlRaw(query).ToListAsync();
             return (empData);
-        }   
+        }
 
         public async Task<Employee?> GetEmployeeByIdAsync(int EmployeeID)
         {
@@ -48,8 +54,8 @@ namespace UnitOfWorkTrial.Repository
         {
             return await _context.Employees
                 .Where(emp => emp.DepartmentId == EmployeeDepartmentId)
-                .Include(e => e.Department).ToListAsync();   
+                .Include(e => e.Department).ToListAsync();
         }
-        
+
     }
 }

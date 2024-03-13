@@ -20,42 +20,31 @@ namespace UnitOfWorkTrial.Controllers
         //Get Employees
         public async Task<IActionResult> Index(Employee employee, int[] DepId, string searchText = "", int page = 1, int size = 10)
         {
-            int recsCount = 0;
             List<Employee> sp;
             string ArrayString = String.Join(",", DepId);
 
-            recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);
+            int recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);
             if (recsCount <= (page - 1) * size)
             {
                 page = 1;
             }
 
-            if (ArrayString == "")
-            {
-                //ArrayString = "1,2";
-                sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
-            }
-            else
-            {
+            sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
 
-                sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
-            }
-             
-            
             int totalPages = (int)Math.Ceiling((decimal)recsCount / (decimal)size);
             int currentPage = page;
             int startPage = currentPage - 5;
             int endPage = currentPage + 4;
 
-            if(startPage <= 0)
+            if (startPage <= 0)
             {
                 endPage = endPage - (startPage - 1);
                 startPage = 1;
             }
-            if(endPage > totalPages)
+            if (endPage > totalPages)
             {
                 endPage = totalPages;
-                if(endPage > 10)
+                if (endPage > 10)
                 {
                     startPage = endPage - 9;
                 }
@@ -71,13 +60,13 @@ namespace UnitOfWorkTrial.Controllers
             ViewBag.ArrayString = ArrayString;
             ViewBag.Data = sp;
             return View(sp);
-            
-        }       
+
+        }
 
         //Get Employees/Details
         public async Task<IActionResult> Details(int? Id)
         {
-            if(Id == null)
+            if (Id == null)
             {
                 return NotFound();
             }
@@ -103,14 +92,14 @@ namespace UnitOfWorkTrial.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Employee employee)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 try
                 {
                     _unitOfWork.CreateTransaction();
 
                     await _unitOfWork.Employees.InsertAsync(employee);
-                        
+
                     await _unitOfWork.Save();
 
                     _unitOfWork.Commit();
@@ -119,24 +108,24 @@ namespace UnitOfWorkTrial.Controllers
                 }
                 catch (Exception)
                 {
-                    _unitOfWork.Rollback(); 
+                    _unitOfWork.Rollback();
                 }
             }
-            ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Employees.GetAllAsync(), "DepartmentId", "Name", employee.DepartmentId);
+            ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments .GetAllAsync(), "DepartmentId", "Name", employee.Department);
             return View(employee);
         }
 
         //Get Employees/Edit
         public async Task<IActionResult> Edit(int? Id)
         {
-            if(Id == null)
+            if (Id == null)
             {
                 return NotFound();
             }
 
             var employee = await _unitOfWork.Employees.GetByIdAsync(Id);
 
-            if(employee == null)
+            if (employee == null)
             {
                 return NotFound();
             }
@@ -167,7 +156,7 @@ namespace UnitOfWorkTrial.Controllers
 
                     return RedirectToAction(nameof(Index));
                 }
-                catch(DbUpdateException)   
+                catch (DbUpdateException)
                 {
                     _unitOfWork.Rollback();
                 }
@@ -218,6 +207,6 @@ namespace UnitOfWorkTrial.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-       
+
     }
 }

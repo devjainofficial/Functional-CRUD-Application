@@ -6,7 +6,7 @@
 }
 
 <h1 class="text-center">Employee Database</h1>
-<br/>
+<br />
 <div class="hstack gap-3">
 
     <form asp-asp-controller="Employees" asp-action="Index" method="get">
@@ -37,7 +37,7 @@
         <form asp-action="Create">
             <button type="submit" class="btn btn-dark position-relative">Add New Employee</button>
         </form>
-    </div> 
+    </div>
 </div>
 
 
@@ -52,15 +52,15 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Id)
-            </th> 
-            <th>
-@*                 @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
- *@                @Html.DisplayNameFor(model => model.Name)
-                
             </th>
             <th>
-@*                 @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
- *@                @Html.DisplayNameFor(model => model.Email)
+                @*                 @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
+                *@                @Html.DisplayNameFor(model => model.Name)
+
+            </th>
+            <th>
+                @*                 @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
+                *@                @Html.DisplayNameFor(model => model.Email)
 
             </th>
             <th>
@@ -73,36 +73,37 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Position)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department.Name)
-            </td>
-            <td class="hstack gap-3">
-                <form asp-action="Edit" asp-route-id="@item.Id">
-                    <button type="submit" class="btn btn-success position-relative">Edit</button>
-                </form>
-                <form asp-action="Details" asp-route-id="@item.Id">
-                    <button type="submit" class="btn btn-primary position-relative">Details</button>
-                </form>
-                <form asp-action="Delete" asp-route-id="@item.Id">
-                    <button type="submit" class="btn btn-danger position-relative">Delete</button>
-                </form>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Position)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.Name)
+                </td>
+                <td class="hstack gap-3">
+                    <form asp-action="Edit" asp-route-id="@item.Id">
+                        <button type="submit" class="btn btn-success position-relative">Edit</button>
+                    </form>
+                    <form asp-action="Details" asp-route-id="@item.Id">
+                        <button type="submit" class="btn btn-primary position-relative">Details</button>
+                    </form>
+                    <form asp-action="Delete" asp-route-id="@item.Id">
+                        <button type="submit" class="btn btn-danger position-relative">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
@@ -116,25 +117,25 @@
             {
 
                 <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(1,'@SearchQuery'">First</a>
+                    <a class="page-link" onclick="SetDepartment(1,'@SearchQuery')">First</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1),'@SearchQuery'">Previous</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1)),'@SearchQuery'">Previous</a>
                 </li>
             }
-            
 
-           @*  @for (var i = 1; i <= ViewBag.TotalPages; i++)
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@i">@i</a>
-                </li>
-            } *@
+
+            @*  @for (var i = 1; i <= ViewBag.TotalPages; i++)
+        {
+        <li class="page-item">
+        <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@i">@i</a>
+        </li>
+        } *@
 
             @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
             {
                 <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" onclick = "SetDepartment(@Page,'@SearchQuery')">@Page</a>
+                    <a class="page-link" onclick="SetDepartment(@Page,'@SearchQuery')">@Page</a>
                 </li>
 
             }
@@ -143,14 +144,14 @@
             {
 
                 <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage + 1),'@SearchQuery'">Next</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage + 1),'@SearchQuery')">Next</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.TotalPage),'@SearchQuery'">Last</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.TotalPages),'@SearchQuery')">Last</a>
                 </li>
             }
 
-           
+
         </ul>
     }
 
