@@ -20,7 +20,6 @@ namespace UnitOfWorkTrial.Controllers
         //Get Employees
         public async Task<IActionResult> Index(Employee employee, int[] DepId, string searchText = "", int page = 1, int size = 10)
         {
-            List<Employee> sp;
             string ArrayString = String.Join(",", DepId);
 
             int recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);
@@ -29,7 +28,7 @@ namespace UnitOfWorkTrial.Controllers
                 page = 1;
             }
 
-            sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
+            List<Employee> sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
 
             int totalPages = (int)Math.Ceiling((decimal)recsCount / (decimal)size);
             int currentPage = page;

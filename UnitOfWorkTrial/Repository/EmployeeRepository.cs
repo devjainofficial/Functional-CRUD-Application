@@ -30,13 +30,9 @@ namespace UnitOfWorkTrial.Repository
                 query = query.Where(x => x.Name.StartsWith(searchString));
             if (deps.Length > 0)
                query = query.Where(x => deps.Contains(x.DepartmentId));
-            return query.Count();
+            return await query.Include(e => e.Department).CountAsync();
         }
-        public async Task<List<Employee>> GetEmployeeAsync(string SearchText)
-        {
-            var employee = await _context.Employees.Include(e => e.Department).Where(e => e.Name.Contains(SearchText)).ToListAsync();
-            return employee;
-        }
+       
         public async Task<List<Employee>> GetStoredProcedure(int Page, int Size, string SearchText, string arrayString)
         {
             var query = $"sp_Employees @Pageindex = '{Page}', @Pagesize = '{Size}', @SearchName = '{SearchText}', @Arraystring = '{arrayString}'";

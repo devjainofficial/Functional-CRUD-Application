@@ -7,16 +7,47 @@
 
 <h1 class="text-center">Employee Database</h1>
 <br />
+
+@* Modal Button *@
+<div>
+    <button type="button" class="btn btn-primary filter-button" data-toggle="modal" data-target="#Filter-Container">
+        Launch demo modal
+    </button>
+</div>
+
+@* Modal *@
+<div class="modal fade" id="Filter-Container" tabindex="-1" role="dialog" aria-labelledby="Filter-ContainerLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Filter-ContainerLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <div class="hstack gap-3">
 
     <form asp-asp-controller="Employees" asp-action="Index" method="get">
         <span class="btn-group">
-            <input name="page" value="@ViewBag.CurrentPage" hidden />
-            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
+@*             <input name="Page" value="@ViewBag.CurrentPage" hidden />
+ *@            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
 
         </span>
 
-        <select class="form-control" id="Department" name="DepId" multiple>
+        <select class="form-control me-auto" id="Department" name="DepId" multiple>
             @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
             {
                 string str = @ViewBag.ArrayString;
@@ -41,11 +72,22 @@
 </div>
 
 
+<div>
+    <ul>
+        <li>
+            <span margin="left" class="hover-overlay shadow-1-strong rounded">
+                Dev
+            </span>
+            <span margin="right" >
+                X
+            </span>
+        </li>
+        
+    </ul>
+</div>
+
 
 <br />
-
-
-
 
 <table class="table table-striped">
     <thead>
@@ -54,14 +96,11 @@
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @*                 @Html.ActionLink("Name", "Index", "Employees", new { sortOrder = ViewBag.NameSortParm })
-                *@                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Name)
 
             </th>
             <th>
-                @*                 @Html.ActionLink("Email", "Index", "Employees", new { sortOrder = ViewBag.EmailSortParm })
-                *@                @Html.DisplayNameFor(model => model.Email)
-
+                @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Position)
@@ -120,7 +159,7 @@
                     <a class="page-link" onclick="SetDepartment(1,'@SearchQuery')">First</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1)),'@SearchQuery'">Previous</a>
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1),'@SearchQuery')">Previous</a>
                 </li>
             }
 
@@ -135,7 +174,7 @@
             @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
             {
                 <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" onclick="SetDepartment(@Page,'@SearchQuery')">@Page</a>
+                    <a class=".cursor-pointer page-link" onclick="SetDepartment(@Page,'@SearchQuery')">@Page</a>
                 </li>
 
             }
@@ -184,6 +223,14 @@
                 path += "&DepId=" + value;
             })
         }
-        window.location.href = 'https://localhost:7178' + path;
+        var hostname = window.location.origin;
+        window.location.href = hostname + path;
     };
+</script>
+
+
+<script>
+    $(document).on('click', '.filter-button', function () {
+        $('#Filter-Container').modal('show');
+    });
 </script>
