@@ -8,62 +8,61 @@
 <h1 class="text-center">Employee Database</h1>
 <br />
 
-@* Modal Button *@
-<div>
-    <button type="button" class="btn btn-primary filter-button" data-toggle="modal" data-target="#Filter-Container">
-        Launch demo modal
-    </button>
-</div>
 
-@* Modal *@
-<div class="modal fade" id="Filter-Container" tabindex="-1" role="dialog" aria-labelledby="Filter-ContainerLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="Filter-ContainerLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+
+
+<div class="hstack gap-3" >
+    @* Modal Button *@
+    <div>
+        <button type="button" class="btn btn-secondary filter-button" data-toggle="modal" data-target="#Filter-Container">
+            Filter Employees
+        </button>
+    </div>
+
+    @* Modal *@
+
+    <div class="modal fade" id="Filter-Container" ; tabindex="-1" role="dialog" aria-labelledby="Filter-ContainerLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="Filter-ContainerLabel">Filter Employees</h5>
+                    <button type="button" class="close border" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form asp-asp-controller="Employees" asp-action="Index" method="get">
+                        <span class="btn-group">
+                            @*<input name="Page" value="@ViewBag.CurrentPage" hidden />*@
+                            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
+                        </span>
+                        <select class="form-control" id="Department" name="DepId" multiple>
+                            @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
+                            {
+                                string str = @ViewBag.ArrayString;
+                                var cast = (Department)dep;
+                                if (str.Split(',').Contains(cast.DepartmentId.ToString()))
+                                {
+                                    <option class="z-index-100 position-relative" value="@cast.DepartmentId" selected>@cast.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@cast.DepartmentId">@cast.Name</option>
+                                }
+                            }
+                        </select>
+                        <div><br/></div>
+                        <div class="modal-footer justify-content-center">
+                            <input class="btn btn-outline-primary" type="submit" value="Search" />
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
-<div class="hstack gap-3">
-
-    <form asp-asp-controller="Employees" asp-action="Index" method="get">
-        <span class="btn-group">
-@*             <input name="Page" value="@ViewBag.CurrentPage" hidden />
- *@            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
-
-        </span>
-
-        <select class="form-control me-auto" id="Department" name="DepId" multiple>
-            @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
-            {
-                string str = @ViewBag.ArrayString;
-                var cast = (Department)dep;
-                if (str.Split(',').Contains(cast.DepartmentId.ToString()))
-                {
-                    <option value="@cast.DepartmentId" selected>@cast.Name</option>
-                }
-                else
-                {
-                    <option value="@cast.DepartmentId">@cast.Name</option>
-                }
-            }
-        </select>
-        <input class="btn btn-secondary" type="submit" value="Search" />
-    </form>
     <div class="vstack gap-3" align="right">
         <form asp-action="Create">
             <button type="submit" class="btn btn-dark position-relative">Add New Employee</button>
@@ -71,21 +70,20 @@
     </div>
 </div>
 
+<div><br /></div>
 
-<div>
-    <ul>
-        <li>
-            <span margin="left" class="hover-overlay shadow-1-strong rounded">
-                Dev
-            </span>
-            <span margin="right" >
-                X
-            </span>
-        </li>
-        
-    </ul>
+
+<div class="hstack gap-1">
+
+    @for(var Page = 1; Page <= 3; Page++)
+    {
+        <div class="hstack bubble">
+            <button class="bubble-text">Dev</button>
+            <button type="button" class="bubble-remove" aria-label="Close" id="close" onclick="this.parentNode.parentNode.remove(); return false;">x</button>
+        </div>
+
+    }
 </div>
-
 
 <br />
 
@@ -230,7 +228,45 @@
 
 
 <script>
+    debugger
     $(document).on('click', '.filter-button', function () {
         $('#Filter-Container').modal('show');
     });
+</script>
+
+<script>
+    $(document).on('click', '.select2-selection', function () {
+        $('#Filter-Container').css('z-index', '0')
+    }); 
+</script>
+
+@* <script>
+    $(document).on('click', '.select2-container', function () {
+        $('#Filter-Container').css('z-index', '0')
+    }); 
+</script> *@
+
+
+<script>
+    $(document).ready(function () {
+        $(document).hover(function (event) {
+            // Check if the clicked element is not within #Filter-Container
+            if (!$(event.target).closest('#Filter-Container').length) {
+                $('#Filter-Container').css('z-index', '1055');
+            }
+        });
+
+        $(document).on('click', '.select2-selection', function () {
+            $('#Filter-Container').css('z-index', '0');
+        });
+    });
+</script>
+
+<script>
+    function () {
+        document.getElementById('close').onclick = function () {
+            this.parentNode.parentNode.remove();
+            return false;
+        };
+    };
 </script>
