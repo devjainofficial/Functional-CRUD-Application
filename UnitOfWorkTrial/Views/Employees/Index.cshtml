@@ -1,4 +1,5 @@
-﻿@model IEnumerable<UnitOfWorkTrial.Models.Employee>
+﻿@using UnitOfWorkTrial.Models.ViewModels
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -74,14 +75,19 @@
 
 
 <div class="hstack gap-1">
-
-    @for(var Page = 1; Page <= 3; Page++)
+    @* @foreach(var Count in SearchTextCount)
     {
         <div class="hstack bubble">
-            <button class="bubble-text">Dev</button>
-            <button type="button" class="bubble-remove" aria-label="Close" id="close" onclick="this.parentNode.parentNode.remove(); return false;">x</button>
+            <button class="bubble-text">@ViewBag.AppliedFiltersForSearchText</button>
+            <button type="button" class="bubble-remove" aria-label="Close" onclick="this.parentNode.remove();">&times;</button>
         </div>
-
+    }  *@
+    @foreach (var filter in Model.AppliedFilters)
+    {
+        <div class="hstack bubble">
+            <button class="bubble-text">@filter</button>
+            <button type="button" class="bubble-remove" aria-label="Close" onclick="this.parentNode.remove();">&times;</button>
+        </div>
     }
 </div>
 
@@ -91,26 +97,26 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                @Html.DisplayNameFor(model => model.Employees[0].Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Employees[0].Name)
 
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.Employees[0].Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Position)
+                @Html.DisplayNameFor(model => model.Employees[0].Position)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DepartmentId)
+                @Html.DisplayNameFor(model => model.Employees[0].DepartmentId)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Employees)
         {
             <tr>
                 <td>
@@ -260,13 +266,4 @@
             $('#Filter-Container').css('z-index', '0');
         });
     });
-</script>
-
-<script>
-    function () {
-        document.getElementById('close').onclick = function () {
-            this.parentNode.parentNode.remove();
-            return false;
-        };
-    };
 </script>

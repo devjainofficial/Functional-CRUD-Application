@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Drawing;
 using UnitOfWorkTrial.Models;
+using UnitOfWorkTrial.Models.ViewModels;
 using UnitOfWorkTrial.UOW;
 
 namespace UnitOfWorkTrial.Controllers
@@ -57,8 +58,28 @@ namespace UnitOfWorkTrial.Controllers
             ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments.GetAllAsync(), "DepartmentId", "Name");
             ViewBag.DepId = DepId;
             ViewBag.ArrayString = ArrayString;
+            var defaultLength = !string.IsNullOrEmpty(searchText) ? 1 : 0;
+            string[] AppliedFilters = new string[DepId.Length + defaultLength];
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                AppliedFilters[0] = searchText;
+            }
+            if(DepId.Length > 0)
+            {
+                var start = !string.IsNullOrEmpty(searchText) ? 1 : 0;
+                foreach(var item in DepId)
+                {
+                    AppliedFilters[start] =DepId.ToString();
+                    start++;
+                }
+            }
+     
             ViewBag.Data = sp;
-            return View(sp);
+            var res = new EmployeeViewModel(){
+                Employees = sp,
+                AppliedFilters = AppliedFilters
+            };
+            return View(res);
 
         }
 
