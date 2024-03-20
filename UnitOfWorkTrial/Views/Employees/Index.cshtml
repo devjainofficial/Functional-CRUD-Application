@@ -1,15 +1,16 @@
-﻿@using UnitOfWorkTrial.Models.ViewModels
+﻿@using UnitOfWorkTrial.Enums
+@using UnitOfWorkTrial.Models.ViewModels
 @model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Index";
-    string SearchQuery = @ViewBag.SearchText;
 }
 
 <h1 class="text-center">Employee Database</h1>
 <br />
 
 
+<partial name="_Pagination" />
 
 
 <div class="hstack gap-3" >
@@ -19,6 +20,8 @@
             Filter Employees
         </button>
     </div>
+
+   
 
     @* Modal *@
 
@@ -33,26 +36,37 @@
                 </div>
                 <div class="modal-body">
                     <form asp-asp-controller="Employees" asp-action="Index" method="get">
-                        <span class="btn-group">
-                            @*<input name="Page" value="@ViewBag.CurrentPage" hidden />*@
-                            <input class="form-control me-auto" type="text" name="SearchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
-                        </span>
-                        <select class="form-control" id="Department" name="DepId" multiple>
-                            @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
-                            {
-                                string str = @ViewBag.ArrayString;
-                                var cast = (Department)dep;
-                                if (str.Split(',').Contains(cast.DepartmentId.ToString()))
-                                {
-                                    <option class="z-index-100 position-relative" value="@cast.DepartmentId" selected>@cast.Name</option>
-                                }
-                                else
-                                {
-                                    <option value="@cast.DepartmentId">@cast.Name</option>
-                                }
-                            }
-                        </select>
-                        <div><br/></div>
+                        <div class="hstack gap-1">
+                            <div class="btn-group">
+                                @*<input name="Page" value="@ViewBag.CurrentPage" hidden />*@
+                                <input class="form-control me-auto" type="text" name="searchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
+                            </div>
+                            <div>
+                                <select class="form-control" id="Department" name="DepId" multiple>
+                                    @foreach (var dep in ((SelectList)ViewData["DepartmentId"]).Items)
+                                    {
+                                        string str = @ViewBag.ArrayString;
+                                        var cast = (Department)dep;
+                                        if (str.Split(',').Contains(cast.DepartmentId.ToString()))
+                                        {
+                                            <option class="z-index-100 position-relative" value="@cast.DepartmentId" selected>@cast.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@cast.DepartmentId">@cast.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div>
+                                @Html.DropDownList("Gender", 
+                                         Html.GetEnumSelectList<EGender>(),
+                                         "Select Gender",
+                                         new { @class = "form-control" }
+                                         )
+                            </div>
+                        </div>
+
                         <div class="modal-footer justify-content-center">
                             <input class="btn btn-outline-primary" type="submit" value="Search" />
                         </div>
@@ -93,112 +107,14 @@
 
 <br />
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Employees[0].Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employees[0].Name)
+<partial name="_EmployeeList" />
 
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employees[0].Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employees[0].Position)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employees[0].DepartmentId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Employees)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Position)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Department.Name)
-                </td>
-                <td class="hstack gap-3">
-                    <form asp-action="Edit" asp-route-id="@item.Id">
-                        <button type="submit" class="btn btn-success position-relative">Edit</button>
-                    </form>
-                    <form asp-action="Details" asp-route-id="@item.Id">
-                        <button type="submit" class="btn btn-primary position-relative">Details</button>
-                    </form>
-                    <form asp-action="Delete" asp-route-id="@item.Id">
-                        <button type="submit" class="btn btn-danger position-relative">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@*  @Html.Partial("_EmployeeList", Model)
+ *@
 
 
-<div class="container">
-    @if (ViewBag.TotalPages > 0)
-    {
-        <ul class="pagination justify-content-end">
+<partial name="_Pagination" />
 
-            @if (ViewBag.CurrentPage > 1)
-            {
-
-                <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(1,'@SearchQuery')">First</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1),'@SearchQuery')">Previous</a>
-                </li>
-            }
-
-
-            @*  @for (var i = 1; i <= ViewBag.TotalPages; i++)
-        {
-        <li class="page-item">
-        <a class="page-link" asp-controller="Employees" asp-action="Index" asp-route-page="@i">@i</a>
-        </li>
-        } *@
-
-            @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
-            {
-                <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
-                    <a class=".cursor-pointer page-link" onclick="SetDepartment(@Page,'@SearchQuery')">@Page</a>
-                </li>
-
-            }
-
-            @if (ViewBag.currentPage < ViewBag.TotalPages)
-            {
-
-                <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage + 1),'@SearchQuery')">Next</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" onclick="SetDepartment(@(ViewBag.TotalPages),'@SearchQuery')">Last</a>
-                </li>
-            }
-
-
-        </ul>
-    }
-
-</div>
 
 <script>
     $(Document).ready(function () {

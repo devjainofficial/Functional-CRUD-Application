@@ -34,6 +34,9 @@ namespace CRUDinCoreMVC
             }
 
             app.UseHttpsRedirection();
+
+            app.UseResponseCaching();
+
             app.UseStaticFiles();
 
             app.UseRouting();

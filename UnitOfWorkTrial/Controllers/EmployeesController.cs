@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using System.Drawing;
 using UnitOfWorkTrial.Models;
+using UnitOfWorkTrial.Models.Filters;
 using UnitOfWorkTrial.Models.ViewModels;
 using UnitOfWorkTrial.UOW;
 
@@ -19,6 +22,10 @@ namespace UnitOfWorkTrial.Controllers
         }
 
         //Get Employees
+        //[AllowAnonymous]
+        [AuthorizationExceptionFilter]      //Custom Exception Filter
+        [ResponseCacheAttribute(NoStore = true, Duration = 10)]     //Result Filter
+        [CustomAuthorizationFilterr]        //Action Filter
         public async Task<IActionResult> Index(Employee employee, int[] DepId, string searchText = "", int page = 1, int size = 10)
         {
             string ArrayString = String.Join(",", DepId);
@@ -29,7 +36,7 @@ namespace UnitOfWorkTrial.Controllers
                 page = 1;
             }
 
-            List<Employee> sp = await _unitOfWork.Employees.GetStoredProcedure(page, size, searchText, ArrayString);
+            var sp = await _unitOfWork.Employees.GetEmployeeDataStoredProcedure(page, size, searchText, ArrayString);
 
             int totalPages = (int)Math.Ceiling((decimal)recsCount / (decimal)size);
             int currentPage = page;
@@ -49,6 +56,7 @@ namespace UnitOfWorkTrial.Controllers
                     startPage = endPage - 9;
                 }
             }
+            
 
             ViewBag.CurrentPage = currentPage;
             ViewBag.TotalPages = totalPages;
@@ -60,29 +68,41 @@ namespace UnitOfWorkTrial.Controllers
             ViewBag.ArrayString = ArrayString;
             var defaultLength = !string.IsNullOrEmpty(searchText) ? 1 : 0;
             string[] AppliedFilters = new string[DepId.Length + defaultLength];
+           
+
             if (!string.IsNullOrEmpty(searchText))
             {
                 AppliedFilters[0] = searchText;
             }
-            if(DepId.Length > 0)
+
+
+  
+            if (DepId.Length > 0)
             {
                 var start = !string.IsNullOrEmpty(searchText) ? 1 : 0;
-                foreach(var item in DepId)
+                foreach (var item in DepId)
                 {
-                    AppliedFilters[start] =DepId.ToString();
+                    var departmentIdAsString = item.ToString();
+                    var departmentName = ((SelectList)ViewData["DepartmentId"]).FirstOrDefault(d => d.Value == departmentIdAsString)?.Text;
+                    if (!string.IsNullOrEmpty(departmentName))
+                    {
+                        AppliedFilters[start] = departmentName;
+                    }
                     start++;
                 }
+               
             }
      
             ViewBag.Data = sp;
-            var res = new EmployeeViewModel(){
+            var result = new EmployeeViewModel(){
                 Employees = sp,
                 AppliedFilters = AppliedFilters
             };
-            return View(res);
+            return View(result);
 
         }
 
+        //[Authorize]
         //Get Employees/Details
         public async Task<IActionResult> Details(int? Id)
         {
@@ -109,7 +129,7 @@ namespace UnitOfWorkTrial.Controllers
         //Post Employees/Create
         [HttpPost]
         // To protect from overposting attacks, enable the specific properties you want to bind to.
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]      //Action Filter
         public async Task<IActionResult> Create(Employee employee)
         {
             if (ModelState.IsValid)
@@ -186,6 +206,7 @@ namespace UnitOfWorkTrial.Controllers
             return View(employee);
         }
         // GET: Employees/Delete/5
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

@@ -6,8 +6,10 @@ using UnitOfWorkTrial.Models;
 
 namespace UnitOfWorkTrial.Repository
 {
+    //Creating EmployeeRepository class to  
     public class EmployeeRepository : GenericRepository<Employee>, IEmployeeRepository
     {
+        //
         public EmployeeRepository(ApplicationDbContext context) : base(context) { }
 
         public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
@@ -19,10 +21,6 @@ namespace UnitOfWorkTrial.Repository
             return await _context.Employees.FromSqlRaw($"sp_Employee @Pageindex = '{Page}', @Pagesize = '{Size}'").ToListAsync();
         }
 
-        public async Task<int> GetAllEmployeesCountAsync()
-        {
-            return await _context.Employees.Include(e => e.Department).CountAsync();
-        }
         public async Task<int> GetAllEmployeesCountAsync(string searchString, int[] deps)
         {
             var query = _context.Employees.AsQueryable();
@@ -33,7 +31,7 @@ namespace UnitOfWorkTrial.Repository
             return await query.Include(e => e.Department).CountAsync();
         }
        
-        public async Task<List<Employee>> GetStoredProcedure(int Page, int Size, string SearchText, string arrayString)
+        public async Task<List<Employee>> GetEmployeeDataStoredProcedure(int Page, int Size, string SearchText, string arrayString)
         {
             var query = $"sp_Employees @Pageindex = '{Page}', @Pagesize = '{Size}', @SearchName = '{SearchText}', @Arraystring = '{arrayString}'";
             var empData = await _context.Employees.FromSqlRaw(query).ToListAsync();

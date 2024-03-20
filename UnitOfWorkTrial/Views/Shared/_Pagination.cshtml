@@ -1,0 +1,45 @@
+﻿@{
+    string SearchQuery = @ViewBag.SearchText;
+}
+
+<div class="container">
+    @if (ViewBag.TotalPages > 0)
+    {
+        <ul class="pagination justify-content-end">
+
+            @if (ViewBag.CurrentPage > 1)
+            {
+
+                <li class="page-item">
+                    <a class="page-link" onclick="SetDepartment(1,'@SearchQuery')">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage - 1),'@SearchQuery')">Previous</a>
+                </li>
+            }
+
+
+            @for (var Page = ViewBag.StartPage; Page <= ViewBag.EndPage; Page++)
+            {
+                <li class="page-item @(Page == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="cursor-pointer page-link" onclick="SetDepartment(@Page,'@SearchQuery')">@Page</a>
+                </li>
+
+            }
+
+            @if (ViewBag.currentPage < ViewBag.TotalPages)
+            {
+
+                <li class="page-item">
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.CurrentPage + 1),'@SearchQuery')">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" onclick="SetDepartment(@(ViewBag.TotalPages),'@SearchQuery')">Last</a>
+                </li>
+            }
+
+
+        </ul>
+    }
+
+</div>
