@@ -23,8 +23,10 @@ namespace CRUDinCoreMVC
             //Registering the UnitOfWork
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            var app = builder.Build();
+            builder.Services.AddSession();  
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -32,6 +34,7 @@ namespace CRUDinCoreMVC
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseSession();
 
             app.UseHttpsRedirection();
 
@@ -46,7 +49,7 @@ namespace CRUDinCoreMVC
             //Setting the Employees and Index action method as the default Route
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Employees}/{action=Index}/{id?}");
+                pattern: "{controller=Employees}/{action=Login}/{id?}");
 
             app.Run();
         }

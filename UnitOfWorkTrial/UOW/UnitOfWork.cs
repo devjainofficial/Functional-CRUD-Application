@@ -14,12 +14,14 @@ namespace UnitOfWorkTrial.UOW
         public EmployeeRepository Employees { get; private set; }
 
         public DepartmentRepository Departments { get; private set; }
+        public UserRepository Users { get; private set; }
 
         public UnitOfWork(ApplicationDbContext _Context)
         {
             Context = _Context;
             Employees = new EmployeeRepository(Context);
             Departments = new DepartmentRepository(Context);
+            Users = new UserRepository(Context);
         }
 
         //The CreateTransaction() method will create a database Transaction so that we can do database operations

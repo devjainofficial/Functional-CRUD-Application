@@ -11,8 +11,8 @@ using UnitOfWorkTrial.Models;
 namespace UnitOfWorkTrial.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240320131654_UpdateDatabase")]
-    partial class UpdateDatabase
+    [Migration("20240321105446_Add-Database")]
+    partial class AddDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,6 +72,39 @@ namespace UnitOfWorkTrial.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("UnitOfWorkTrial.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Age")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("UnitOfWorkTrial.Models.Employee", b =>

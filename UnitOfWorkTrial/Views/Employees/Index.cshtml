@@ -6,12 +6,18 @@
     ViewData["Title"] = "Index";
 }
 
-<h1 class="text-center">Employee Database</h1>
+<div class="hstack gap-3 align-items float-end">
+    <span>Welcome @ViewBag.Session</span>
+    <form asp-action="Logout">
+        <button type="submit" class="btn btn-danger position-relative">Logout</button>
+    </form>
+</div>
+<br/>
+<div class="text-center">
+    <h1 >Employee Database</h1>
+
+</div>
 <br />
-
-
-<partial name="_Pagination" />
-
 
 <div class="hstack gap-3" >
     @* Modal Button *@
@@ -20,8 +26,6 @@
             Filter Employees
         </button>
     </div>
-
-   
 
     @* Modal *@
 
@@ -81,6 +85,11 @@
     <div class="vstack gap-3" align="right">
         <form asp-action="Create">
             <button type="submit" class="btn btn-dark position-relative">Add New Employee</button>
+        </form>
+    </div>
+    <div align="right">
+        <form asp-controller="Departments" asp-action="DepIndex">
+            <button type="submit" class="btn btn-info position-relative">Add New Department</button>
         </form>
     </div>
 </div>

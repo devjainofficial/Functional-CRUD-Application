@@ -7,6 +7,7 @@ namespace UnitOfWorkTrial.UOW
     {
         EmployeeRepository Employees { get; }
         DepartmentRepository Departments { get; }
+        UserRepository Users { get; }
 
         void CreateTransaction();
         void Commit();

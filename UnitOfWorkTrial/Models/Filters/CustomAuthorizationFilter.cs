@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace UnitOfWorkTrial.Models.Filters
 {
-    public class CustomAuthorizationFilterr : ActionFilterAttribute
+    public class CustomAuthorizationFilter : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -17,7 +17,7 @@ namespace UnitOfWorkTrial.Models.Filters
         private bool CheckCustomAuthorizationCondition(ActionExecutingContext context)
         {
 
-            if (!context.HttpContext.User.IsInRole("Admin"))
+            if (!context.HttpContext.User.IsInRole("User"))
             {
                 return true;
             }

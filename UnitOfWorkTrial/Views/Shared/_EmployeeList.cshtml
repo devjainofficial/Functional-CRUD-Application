@@ -18,6 +18,9 @@
                 @Html.DisplayNameFor(model => model.Employees[0].Position)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Employees[0].Gender)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Employees[0].DepartmentId)
             </th>
             <th></th>
@@ -40,10 +43,13 @@
                     @Html.DisplayFor(modelItem => item.Position)
                 </td> 
                 <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td> 
+                <td>
                     @Html.DisplayFor(modelItem => item.Department.Name)
                 </td>
                 <td class="hstack gap-3">
-                    <form asp-action="Edit" asp-route-id="@item.Id">
+                    <form method="get" asp-action="Edit" asp-route-id="@item.Id">
                         <button type="submit" class="btn btn-success position-relative">Edit</button>
                     </form>
                     <form asp-action="Details" asp-route-id="@item.Id">

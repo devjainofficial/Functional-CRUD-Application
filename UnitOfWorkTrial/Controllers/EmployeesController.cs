@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update.Internal;
-using System.Drawing;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using UnitOfWorkTrial.Models;
 using UnitOfWorkTrial.Models.Filters;
 using UnitOfWorkTrial.Models.ViewModels;
 using UnitOfWorkTrial.UOW;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UnitOfWorkTrial.Controllers
 {
@@ -21,13 +19,25 @@ namespace UnitOfWorkTrial.Controllers
             _unitOfWork = unitOfWork;
         }
 
+       
+
+
         //Get Employees
         //[AllowAnonymous]
         [AuthorizationExceptionFilter]      //Custom Exception Filter
         [ResponseCacheAttribute(NoStore = true, Duration = 10)]     //Result Filter
-        [CustomAuthorizationFilterr]        //Action Filter
+        [CustomAuthorizationFilter]        //Action Filter
         public async Task<IActionResult> Index(Employee employee, int[] DepId, string searchText = "", int page = 1, int size = 10)
         {
+            if(HttpContext.Session.GetString("UserSession") != null)
+            {
+                ViewBag.Session = HttpContext.Session.GetString("UserSession");
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
+
             string ArrayString = String.Join(",", DepId);
 
             int recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);
@@ -56,7 +66,7 @@ namespace UnitOfWorkTrial.Controllers
                     startPage = endPage - 9;
                 }
             }
-            
+
 
             ViewBag.CurrentPage = currentPage;
             ViewBag.TotalPages = totalPages;
@@ -68,7 +78,7 @@ namespace UnitOfWorkTrial.Controllers
             ViewBag.ArrayString = ArrayString;
             var defaultLength = !string.IsNullOrEmpty(searchText) ? 1 : 0;
             string[] AppliedFilters = new string[DepId.Length + defaultLength];
-           
+
 
             if (!string.IsNullOrEmpty(searchText))
             {
@@ -76,7 +86,7 @@ namespace UnitOfWorkTrial.Controllers
             }
 
 
-  
+
             if (DepId.Length > 0)
             {
                 var start = !string.IsNullOrEmpty(searchText) ? 1 : 0;
@@ -90,11 +100,12 @@ namespace UnitOfWorkTrial.Controllers
                     }
                     start++;
                 }
-               
+
             }
-     
+
             ViewBag.Data = sp;
-            var result = new EmployeeViewModel(){
+            var result = new EmployeeViewModel()
+            {
                 Employees = sp,
                 AppliedFilters = AppliedFilters
             };
@@ -151,7 +162,7 @@ namespace UnitOfWorkTrial.Controllers
                     _unitOfWork.Rollback();
                 }
             }
-            ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments .GetAllAsync(), "DepartmentId", "Name", employee.Department);
+            ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments.GetAllAsync(), "DepartmentId", "Name", employee.Department);
             return View(employee);
         }
 
@@ -163,7 +174,7 @@ namespace UnitOfWorkTrial.Controllers
                 return NotFound();
             }
 
-            var employee = await _unitOfWork.Employees.GetByIdAsync(Id);
+            var employee = await _unitOfWork.Employees.GetEmployeeByIdAsync(Convert.ToInt32(Id));
 
             if (employee == null)
             {
@@ -248,6 +259,37 @@ namespace UnitOfWorkTrial.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> Login()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> Login(User user)
+        {
+            var User = _unitOfWork.Users.VerifyUser(user.Email, user.Password);
+
+            if (User != null)
+            {
+                HttpContext.Session.SetString("UserSession", user.Email);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ViewBag.Message = "Retry Login";
+            }
+            return View();
+        }
+
+
+        public async Task<IActionResult> Logout()
+        {
+            if (HttpContext.Session.GetString("UserSession") != null)
+            {
+                HttpContext.Session.Remove("UserSession");
+                return RedirectToAction("Login");
+            }
+            return View();
+        }
     }
 }

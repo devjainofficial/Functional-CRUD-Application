@@ -50,6 +50,5 @@ namespace UnitOfWorkTrial.Repository
                 .Where(emp => emp.DepartmentId == EmployeeDepartmentId)
                 .Include(e => e.Department).ToListAsync();
         }
-
     }
 }

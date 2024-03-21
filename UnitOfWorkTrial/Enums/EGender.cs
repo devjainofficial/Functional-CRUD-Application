@@ -4,9 +4,9 @@ namespace UnitOfWorkTrial.Enums
 {
     public enum EGender
     {
-        Male = 0,
-        Female = 1,
-        Others = 2
+        Male = 1,
+        Female = 2,
+        Others = 3
     }
    
 }

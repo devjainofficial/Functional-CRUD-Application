@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using UnitOfWorkTrial.Enums;
 
 namespace UnitOfWorkTrial.Models
 {
@@ -10,7 +11,7 @@ namespace UnitOfWorkTrial.Models
         public string Name { get; set; }
         public string Email { get; set; }
         public string Position { get; set; }
-        public int Gender { get; set; }
+        public EGender Gender { get; set; }
 
         [Display(Name = "Department Name")]
         public int DepartmentId { get; set; }
