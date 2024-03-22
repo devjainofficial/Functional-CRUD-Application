@@ -12,7 +12,6 @@ namespace UnitOfWorkTrial.UOW
         private IDbContextTransaction? _objTran = null;
 
         public EmployeeRepository Employees { get; private set; }
-
         public DepartmentRepository Departments { get; private set; }
         public UserRepository Users { get; private set; }
 

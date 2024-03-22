@@ -8,7 +8,7 @@
 
 <div class="hstack gap-3 align-items float-end">
     <span>Welcome @ViewBag.Session</span>
-    <form asp-action="Logout">
+    <form asp-controller="Users" asp-action="Logout">
         <button type="submit" class="btn btn-danger position-relative">Logout</button>
     </form>
 </div>

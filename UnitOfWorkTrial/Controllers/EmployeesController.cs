@@ -19,9 +19,6 @@ namespace UnitOfWorkTrial.Controllers
             _unitOfWork = unitOfWork;
         }
 
-       
-
-
         //Get Employees
         //[AllowAnonymous]
         [AuthorizationExceptionFilter]      //Custom Exception Filter
@@ -35,7 +32,7 @@ namespace UnitOfWorkTrial.Controllers
             }
             else
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login", "Users");
             }
 
             string ArrayString = String.Join(",", DepId);
@@ -257,39 +254,6 @@ namespace UnitOfWorkTrial.Controllers
                 }
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(User user)
-        {
-            var User = _unitOfWork.Users.VerifyUser(user.Email, user.Password);
-
-            if (User != null)
-            {
-                HttpContext.Session.SetString("UserSession", user.Email);
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                ViewBag.Message = "Retry Login";
-            }
-            return View();
-        }
-
-
-        public async Task<IActionResult> Logout()
-        {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                HttpContext.Session.Remove("UserSession");
-                return RedirectToAction("Login");
-            }
-            return View();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace CRUDinCoreMVC
             //Setting the Employees and Index action method as the default Route
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Employees}/{action=Login}/{id?}");
+                pattern: "{controller=Employees}/{action=Index}/{id?}");
 
             app.Run();
         }
