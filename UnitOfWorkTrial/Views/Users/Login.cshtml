@@ -5,14 +5,14 @@
     ViewData["Title"] = "Login";
 }
 
-<h1>User Login</h1>
+<h1 class="d-flex justify-content-center">User Login</h1>
 
 <hr />
 
 @if(ViewBag.Message != null){
     <p style="color: red">@ViewBag.Message</p>
 }
-<div class="row">
+<div class="d-flex justify-content-center align-items-center row">
     <div class="col-md-4">
         <form asp-action="Login">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -27,15 +27,15 @@
                 <input asp-for="Password" class="form-control" type="password"/>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-           
-            <div class="form-group">
+           </br>
+            <div class="form-group d-flex justify-content-center align-items-center row">
                 <input type="submit" value="Login" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-<div>
-    Not Registered Yet? <a href="/Users/Registration">Click Here</a> to SignUp
+<div class="d-flex justify-content-center align-items-center row">
+    Not Registered Yet? <a href="/Users/Registration" class="d-flex justify-content-center row">Click Here to SignUp</a>
 </div>
 
 @section Scripts {

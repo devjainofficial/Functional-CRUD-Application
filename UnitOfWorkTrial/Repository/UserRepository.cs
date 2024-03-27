@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using UnitOfWorkTrial.GenericRepository;
 using UnitOfWorkTrial.Models;
-using UnitOfWorkTrial.Repository;
 
 namespace UnitOfWorkTrial.Repository
 {

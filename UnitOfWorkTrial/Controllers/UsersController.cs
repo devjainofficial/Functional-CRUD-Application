@@ -21,15 +21,19 @@ namespace UnitOfWorkTrial.Controllers
         {
             var User = _unitOfWork.Users.VerifyUser(user.Email, user.Password);
 
-            if (User != null)
+            if (User.Result != null)
             {
                 HttpContext.Session.SetString("UserSession", user.Email);
+                CookieOptions cookies = new CookieOptions();
+                cookies.Expires = DateTime.Now.AddMinutes(100);
+                Response.Cookies.Append("Name", User.Result.Name, cookies);
                 return RedirectToAction("Index", "Employees");
             }
             else
             {
-                ViewBag.Message = "Retry Login";
+                ViewBag.Message = "Retry With Correct Id and Password Login";
             }
+           
             return View();
         }
 
@@ -39,6 +43,7 @@ namespace UnitOfWorkTrial.Controllers
             if (HttpContext.Session.GetString("UserSession") != null)
             {
                 HttpContext.Session.Remove("UserSession");
+                Response.Cookies.Delete("Name");
                 return RedirectToAction("Login");
             }
             return View();

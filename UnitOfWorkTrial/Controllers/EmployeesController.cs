@@ -35,6 +35,8 @@ namespace UnitOfWorkTrial.Controllers
                 return RedirectToAction("Login", "Users");
             }
 
+            
+
             string ArrayString = String.Join(",", DepId);
 
             int recsCount = await _unitOfWork.Employees.GetAllEmployeesCountAsync(searchText, DepId);

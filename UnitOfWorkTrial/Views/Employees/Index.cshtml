@@ -1,6 +1,7 @@
 ﻿@using UnitOfWorkTrial.Enums
 @using UnitOfWorkTrial.Models.ViewModels
-@model EmployeeViewModel
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "Index";
@@ -8,16 +9,23 @@
 
 <div class="hstack gap-3 align-items float-end">
     <span>Welcome @ViewBag.Session</span>
+    <span>
+        <b>Name:</b> @HttpContextAccessor?.HttpContext?.Request.Cookies["Name"]
+        <br />
+    </span>
     <form asp-controller="Users" asp-action="Logout">
         <button type="submit" class="btn btn-danger position-relative">Logout</button>
     </form>
 </div>
 <br/>
-<div class="text-center">
-    <h1 >Employee Database</h1>
 
+<div class="container d-flex justify-content-center align-items-center">
+    <div class="row">
+        <div class="col text-center">
+            <h1>Employee Database</h1>
+        </div>
+    </div>
 </div>
-<br />
 
 <div class="hstack gap-3" >
     @* Modal Button *@
@@ -42,7 +50,6 @@
                     <form asp-asp-controller="Employees" asp-action="Index" method="get">
                         <div class="hstack gap-1">
                             <div class="btn-group">
-                                @*<input name="Page" value="@ViewBag.CurrentPage" hidden />*@
                                 <input class="form-control me-auto" type="text" name="searchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
                             </div>
                             <div>
@@ -98,18 +105,11 @@
 
 
 <div class="hstack gap-1">
-    @* @foreach(var Count in SearchTextCount)
-    {
-        <div class="hstack bubble">
-            <button class="bubble-text">@ViewBag.AppliedFiltersForSearchText</button>
-            <button type="button" class="bubble-remove" aria-label="Close" onclick="this.parentNode.remove();">&times;</button>
-        </div>
-    }  *@
     @foreach (var filter in Model.AppliedFilters)
     {
         <div class="hstack bubble">
             <button class="bubble-text">@filter</button>
-            <button type="button" class="bubble-remove" aria-label="Close" onclick="this.parentNode.remove();">&times;</button>
+            <button type="button" class="bubble-remove" aria-label="Close" onclick=" this.parentNode.remove(); RemoveBubble('@filter');">&times;</button>
         </div>
     }
 </div>
@@ -192,3 +192,29 @@
         });
     });
 </script>
+
+<script>
+    function RemoveBubble(filter) {
+        // Remove the filter from wherever it's stored (e.g., Model.AppliedFilters)
+        var index = Model.AppliedFilters.indexOf(filter);
+        if (index !== -1) {
+            Model.AppliedFilters.splice(index, 1);
+        }
+
+        // Construct the new URL without the removed filter
+        var baseUrl = '@Url.Action("Index", "Employees")'; // Assuming EmployeesController
+        var queryParams = new URLSearchParams(window.location.search);
+        queryParams.delete(filter); // Assuming 'filter' is the query parameter for filters
+        // You may need to adjust the query parameter name according to your implementation
+
+        // Append the remaining filters back to the URL
+        for (var i = 0; i < Model.AppliedFilters.length; i++) {
+            queryParams.append(filter, Model.AppliedFilters[i]);
+        }
+
+        // Redirect to the updated URL
+        window.location.href = baseUrl + '?' + queryParams.toString();
+    }
+</script>
+
+

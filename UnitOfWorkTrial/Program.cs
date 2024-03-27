@@ -23,7 +23,7 @@ namespace CRUDinCoreMVC
             //Registering the UnitOfWork
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            builder.Services.AddSession();  
+            builder.Services.AddSession();
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             var app = builder.Build();
