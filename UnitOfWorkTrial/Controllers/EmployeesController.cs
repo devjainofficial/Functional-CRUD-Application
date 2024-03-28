@@ -75,8 +75,8 @@ namespace UnitOfWorkTrial.Controllers
             ViewData["DepartmentId"] = new SelectList(await _unitOfWork.Departments.GetAllAsync(), "DepartmentId", "Name");
             ViewBag.DepId = DepId;
             ViewBag.ArrayString = ArrayString;
-            var defaultLength = !string.IsNullOrEmpty(searchText) ? 1 : 0;
-            string[] AppliedFilters = new string[DepId.Length + defaultLength];
+            var SearchTextLength = !string.IsNullOrEmpty(searchText) ? 1 : 0;
+            string[] AppliedFilters = new string[DepId.Length + SearchTextLength];
 
 
             if (!string.IsNullOrEmpty(searchText))

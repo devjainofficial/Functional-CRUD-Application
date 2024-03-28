@@ -6,7 +6,8 @@ namespace UnitOfWorkTrial.Enums
     {
         Male = 1,
         Female = 2,
-        Others = 3
+        Others = 3,
+        None = 4
     }
    
 }

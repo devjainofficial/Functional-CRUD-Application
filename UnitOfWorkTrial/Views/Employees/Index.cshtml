@@ -2,10 +2,15 @@
 @using UnitOfWorkTrial.Models.ViewModels
 @using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor HttpContextAccessor
+@model EmployeeViewModel
 
 @{
     ViewData["Title"] = "Index";
+    var appliedFiltersJson = Newtonsoft.Json.JsonConvert.SerializeObject(Model.AppliedFilters);
 }
+
+@Html.Hidden("appliedFiltersJson", appliedFiltersJson)
+
 
 <div class="hstack gap-3 align-items float-end">
     <span>Welcome @ViewBag.Session</span>
@@ -17,7 +22,7 @@
         <button type="submit" class="btn btn-danger position-relative">Logout</button>
     </form>
 </div>
-<br/>
+<br />
 
 <div class="container d-flex justify-content-center align-items-center">
     <div class="row">
@@ -27,7 +32,7 @@
     </div>
 </div>
 
-<div class="hstack gap-3" >
+<div class="hstack gap-3">
     @* Modal Button *@
     <div>
         <button type="button" class="btn btn-secondary filter-button" data-toggle="modal" data-target="#Filter-Container">
@@ -48,7 +53,7 @@
                 </div>
                 <div class="modal-body">
                     <form asp-asp-controller="Employees" asp-action="Index" method="get">
-                        <div class="hstack gap-1">
+                        <div class="hstack gap-4">
                             <div class="btn-group">
                                 <input class="form-control me-auto" type="text" name="searchText" value="@ViewBag.SearchText" placeholder="Search Employee" />
                             </div>
@@ -69,15 +74,8 @@
                                     }
                                 </select>
                             </div>
-                            <div>
-                                @Html.DropDownList("Gender", 
-                                         Html.GetEnumSelectList<EGender>(),
-                                         "Select Gender",
-                                         new { @class = "form-control" }
-                                         )
-                            </div>
                         </div>
-
+                        <br />
                         <div class="modal-footer justify-content-center">
                             <input class="btn btn-outline-primary" type="submit" value="Search" />
                         </div>
@@ -109,11 +107,10 @@
     {
         <div class="hstack bubble">
             <button class="bubble-text">@filter</button>
-            <button type="button" class="bubble-remove" aria-label="Close" onclick=" this.parentNode.remove(); RemoveBubble('@filter');">&times;</button>
+            <button type="button" class="bubble-remove" aria-label="Close" onclick="RemoveBubble('@filter');">&times;</button>
         </div>
     }
 </div>
-
 <br />
 
 <partial name="_EmployeeList" />
@@ -138,7 +135,7 @@
 
 <script>
     function SetDepartment(Page, SearchText) {
-        debugger
+        // debugger
         var path = "/Employees/Index?Page=" + Page;
         if (SearchText != null && SearchText != '') {
             path += "&SearchText=" + SearchText;
@@ -146,7 +143,7 @@
 
         var a = [@ViewBag.ArrayString];
 
-        if (a.length > 0){
+        if (a.length > 0) {
             debugger
             $.each(a, function (index, value) {
                 path += "&DepId=" + value;
@@ -159,7 +156,7 @@
 
 
 <script>
-    debugger
+    // debugger
     $(document).on('click', '.filter-button', function () {
         $('#Filter-Container').modal('show');
     });
@@ -168,13 +165,13 @@
 <script>
     $(document).on('click', '.select2-selection', function () {
         $('#Filter-Container').css('z-index', '0')
-    }); 
+    });
 </script>
 
 @* <script>
     $(document).on('click', '.select2-container', function () {
         $('#Filter-Container').css('z-index', '0')
-    }); 
+    });
 </script> *@
 
 
@@ -193,28 +190,37 @@
     });
 </script>
 
+
+
 <script>
     function RemoveBubble(filter) {
-        // Remove the filter from wherever it's stored (e.g., Model.AppliedFilters)
-        var index = Model.AppliedFilters.indexOf(filter);
-        if (index !== -1) {
-            Model.AppliedFilters.splice(index, 1);
+        debugger
+        $(event.target).closest('.bubble').remove();
+        var url = window.location.href;
+        var urlParts = url.split('?');
+        var baseUrl = urlParts[0];
+        var searchParams = new URLSearchParams(urlParts[1]);
+
+        var depIds = searchParams.getAll('DepId');
+        if (depIds) {
+            depIds = depIds.filter(depId => depId !== filter);
+            searchParams.delete('DepId');
         }
 
-        // Construct the new URL without the removed filter
-        var baseUrl = '@Url.Action("Index", "Employees")'; // Assuming EmployeesController
-        var queryParams = new URLSearchParams(window.location.search);
-        queryParams.delete(filter); // Assuming 'filter' is the query parameter for filters
-        // You may need to adjust the query parameter name according to your implementation
-
-        // Append the remaining filters back to the URL
-        for (var i = 0; i < Model.AppliedFilters.length; i++) {
-            queryParams.append(filter, Model.AppliedFilters[i]);
+        var searchText = searchParams.get('searchText');
+        if (searchText && searchText.includes(filter)) {
+            searchText = searchText.replace(filter, '').replace('&&', '&').replace('?&', '?');
+            if (searchText === '') {
+                searchParams.delete('searchText');
+            } else {
+                searchParams.set('searchText', searchText);
+            }
         }
+
+        // Construct the new URL
+        var newUrl = baseUrl + '?' + searchParams.toString();
 
         // Redirect to the updated URL
-        window.location.href = baseUrl + '?' + queryParams.toString();
+        window.location.href = newUrl;
     }
 </script>
-
-
