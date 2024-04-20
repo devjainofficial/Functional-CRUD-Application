@@ -3,7 +3,7 @@
 ###  Stored Procedure
 
 ```
-ALTER procedure [dbo].[sp_Employees]  
+CREATE procedure [dbo].[sp_Employees]  
 @Pageindex int,  
 @Pagesize int,  
 @SearchName varchar(50),
